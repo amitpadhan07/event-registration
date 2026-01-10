@@ -1,19 +1,22 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-// 👇 Sirf 'service: gmail' use karenge, ye automatic best settings le lega
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com', // Service 'gmail' hata ke direct host use kar rahe hain
+  port: 465,              // SSL Port
+  secure: true,           // SSL ON
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD, // App Password hi hona chahiye
+    pass: process.env.EMAIL_PASSWORD,
   },
-  // Extra stability settings
+  // 👇 YE HAI MAGIC FIX (Force IPv4) 👇
+  family: 4, 
+  // 👇 Stability Settings
   tls: {
     rejectUnauthorized: false
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000
+  connectionTimeout: 15000, // Thoda timeout aur badha diya (15s)
+  greetingTimeout: 15000
 });
 
 async function sendConfirmationEmail(registrationData, qrCodeDataURL) {
@@ -44,8 +47,9 @@ async function sendConfirmationEmail(registrationData, qrCodeDataURL) {
   };
 
   try {
+    console.log(`📨 Attempting to send email to ${email}...`);
     await transporter.sendMail(mailOptions);
-    console.log(`✅ Email sent to ${email}`);
+    console.log(`✅ Email sent successfully to ${email}`);
     return true;
   } catch (error) {
     console.error('❌ Email sending error:', error);
