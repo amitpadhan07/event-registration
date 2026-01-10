@@ -1,30 +1,27 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+// 👇 Configure Transporter for Brevo
 const transporter = nodemailer.createTransport({
-  host: 'smtp.googlemail.com', // 👈 TRICK 1: Google ka alternate host address
-  port: 465,                   // 👈 TRICK 2: Port 465 wapis use kar rahe hain
-  secure: true,                // 👈 465 ke liye ye true hona chahiye
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT),
+  secure: false, // Brevo port 587 ke liye false
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
   },
-  family: 4,                   // 👈 Force IPv4 (Ye zaroori hai)
-  pool: true,                  // 👈 Connection pool on kiya stability ke liye
   tls: {
     rejectUnauthorized: false
   },
-  connectionTimeout: 30000,    // 30 seconds timeout
-  greetingTimeout: 30000,
-  debug: true,                 // Logs on rahenge
-  logger: true
+  connectionTimeout: 10000,
+  debug: true
 });
 
 async function sendConfirmationEmail(registrationData, qrCodeDataURL) {
   const { name, email, event, registrationCode } = registrationData;
 
   const mailOptions = {
-    from: `"Event Registration" <${process.env.EMAIL_USER}>`,
+    from: `"Event Registration" <${process.env.EMAIL_FROM}>`, // Sender email alag ho sakta hai
     to: email,
     subject: `Registration Confirmed - ${event.title}`,
     html: `
@@ -48,12 +45,12 @@ async function sendConfirmationEmail(registrationData, qrCodeDataURL) {
   };
 
   try {
-    console.log(`📨 Attempting to send email to ${email} via smtp.googlemail.com...`);
+    console.log(`📨 Sending email to ${email} via Brevo...`);
     await transporter.sendMail(mailOptions);
     console.log(`✅ Email sent successfully to ${email}`);
     return true;
   } catch (error) {
-    console.error('❌ Email sending error details:', error);
+    console.error('❌ Email sending error:', error);
     return false;
   }
 }
