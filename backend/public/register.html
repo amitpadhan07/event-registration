@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Registration Form</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎉 Event Registration</h1>
+    </header>
+
+    <div class="main-content">
+      <a href="/" class="back-link">← Back to Events</a>
+
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading event details...</p>
+      </div>
+
+      <div id="registration-form-container" style="display: none;">
+        <div id="event-details" class="event-details-box"></div>
+
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+        <div id="error-message" class="alert alert-error" style="display: none;"></div>
+
+        <form id="registration-form">
+          <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number *</label>
+            <input type="tel" id="phone" name="phone" required placeholder="+1234567890">
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            Register for Event
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/registration.js"></script>
+</body>
+</html>

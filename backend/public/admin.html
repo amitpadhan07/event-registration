@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - QR Code Scanner</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔍 Admin - Attendance Scanner</h1>
+    </header>
+
+    <div class="main-content">
+      <a href="/" class="back-link">← Back to Events</a>
+
+      <div class="scanner-section">
+        <h2>Scan QR Code for Attendance</h2>
+        <p>Enter the registration code from the attendee's QR code:</p>
+
+        <div class="scanner-input">
+          <div class="form-group">
+            <input 
+              type="text" 
+              id="qr-code-input" 
+              placeholder="EVT-XXXX-XXXX-XXXX" 
+              autofocus
+            >
+          </div>
+          <button class="btn btn-primary" id="verify-btn">Verify & Mark Attendance</button>
+        </div>
+
+        <div id="result-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
