@@ -1,25 +1,23 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-// Configure Transporter for Port 587 (Standard Cloud Email Port)
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,              // 👈 Changing to 587 (More reliable on Cloud)
-  secure: false,          // 👈 587 ke liye ye FALSE hona chahiye
+  host: 'smtp.googlemail.com', // 👈 TRICK 1: Google ka alternate host address
+  port: 465,                   // 👈 TRICK 2: Port 465 wapis use kar rahe hain
+  secure: true,                // 👈 465 ke liye ye true hona chahiye
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
   },
-  family: 4,              // 👈 Force IPv4 (Connection drop fix)
+  family: 4,                   // 👈 Force IPv4 (Ye zaroori hai)
+  pool: true,                  // 👈 Connection pool on kiya stability ke liye
   tls: {
     rejectUnauthorized: false
   },
-  // 👇 Stability & Debug Settings
-  connectionTimeout: 20000, // 20 seconds
-  greetingTimeout: 20000,
-  socketTimeout: 20000,
-  debug: true,            // 👈 Logs mein detailed error dikhayega
-  logger: true            // 👈 Console mein print karega
+  connectionTimeout: 30000,    // 30 seconds timeout
+  greetingTimeout: 30000,
+  debug: true,                 // Logs on rahenge
+  logger: true
 });
 
 async function sendConfirmationEmail(registrationData, qrCodeDataURL) {
@@ -50,7 +48,7 @@ async function sendConfirmationEmail(registrationData, qrCodeDataURL) {
   };
 
   try {
-    console.log(`📨 Attempting to send email to ${email} via Port 587...`);
+    console.log(`📨 Attempting to send email to ${email} via smtp.googlemail.com...`);
     await transporter.sendMail(mailOptions);
     console.log(`✅ Email sent successfully to ${email}`);
     return true;
