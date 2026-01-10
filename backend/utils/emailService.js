@@ -9,6 +9,12 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
   },
+  // 👇 Ye settings add ki hain stability ke liye
+  tls: {
+    rejectUnauthorized: false
+  },
+  connectionTimeout: 10000, // 10 seconds wait karega
+  greetingTimeout: 10000
 });
 
 async function sendConfirmationEmail(registrationData, qrCodeDataURL) {
@@ -84,7 +90,8 @@ async function sendConfirmationEmail(registrationData, qrCodeDataURL) {
     return true;
   } catch (error) {
     console.error('❌ Email sending error:', error);
-    throw new Error('Failed to send confirmation email');
+    // Error throw nahi karenge taaki server crash na ho, bas log karenge
+    return false;
   }
 }
 
