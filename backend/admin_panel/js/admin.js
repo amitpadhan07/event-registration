@@ -1,5 +1,6 @@
 const API_URL = '/api';
 
+// --- 🔊 BEEP SOUND SETUP ---
 const beepSound = new Audio("data:audio/wav;base64,UklGRl9vT19WAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU");
 
 // --- 📷 Camera Scanner Logic ---
@@ -7,24 +8,7 @@ const beepSound = new Audio("data:audio/wav;base64,UklGRl9vT19WAABXQVZFZm10IBAAA
 function onScanSuccess(decodedText, decodedResult) {
   console.log(`Code scanned = ${decodedText}`);
 
-  // 1. 📳 Try Vibrate (Android Only)
-  try {
-    if (window.navigator && window.navigator.vibrate) {
-      // Vibrate pattern: 200ms
-      window.navigator.vibrate(200);
-    }
-  } catch (e) {
-    console.log("Vibration not supported");
-  }
-
-  // 2. 🔊 Play Beep Sound
-  try {
-    beepSound.play().catch(e => console.log("Audio requires user interaction first"));
-  } catch (e) {
-    console.log("Sound error");
-  }
-
-  // 3. Fill the input field
+  // 1. Fill the input field
   const input = document.getElementById('qr-code-input');
   
   // Prevent duplicate scans of the same code immediately
@@ -32,7 +16,8 @@ function onScanSuccess(decodedText, decodedResult) {
 
   input.value = decodedText;
 
-  // 4. Automatically trigger verification
+  // 2. Automatically trigger verification
+  // Note: We removed vibration from here!
   verifyAttendance();
 }
 
@@ -50,7 +35,7 @@ const html5QrcodeScanner = new Html5QrcodeScanner(
 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
 
-// --- ⌨️ Existing Verification Logic ---
+// --- ⌨️ Verification Logic ---
 
 document.getElementById('verify-btn').addEventListener('click', verifyAttendance);
 
@@ -64,12 +49,13 @@ async function verifyAttendance() {
   const input = document.getElementById('qr-code-input');
   const registrationCode = input.value.trim();
   const resultContainer = document.getElementById('result-container');
-  
+
   if (!registrationCode) {
     alert('Please enter a registration code');
     return;
   }
 
+  // Show verifying state
   resultContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Verifying...</p></div>';
 
   try {
@@ -82,34 +68,54 @@ async function verifyAttendance() {
     const data = await response.json();
 
     if (data.success) {
+      // ✅ SUCCESS! Vibrate & Beep HERE now
+      triggerFeedback(); 
+
       displaySuccessResult(data);
-      // 👇 NEW: Update the stats UI
-      updateStats(data.stats);
+      
+      if (typeof updateStats === "function") {
+        updateStats(data.stats);
+      }
     } else {
       displayErrorResult(data.message);
     }
+
   } catch (error) {
     console.error('Verification error:', error);
     displayErrorResult('Verification failed. Please try again.');
   }
 }
 
+// Helper function for Sound + Vibration
+function triggerFeedback() {
+  // 1. 📳 Vibrate (Only on success)
+  try {
+    if (window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(200);
+    }
+  } catch (e) {
+    console.log("Vibration failed");
+  }
+
+  // 2. 🔊 Play Beep
+  try {
+    beepSound.play().catch(e => console.log("Audio requires interaction"));
+  } catch (e) {
+    console.log("Sound failed");
+  }
+}
+
 function updateStats(stats) {
   if (!stats) return;
-
   const statsContainer = document.getElementById('stats-container');
-  const checkedInEl = document.getElementById('stat-checked-in');
-  const totalEl = document.getElementById('stat-total');
-  const remainingEl = document.getElementById('stat-remaining');
-
-  // Show the container
-  statsContainer.style.display = 'block';
-
-  // Animate numbers (simple text update)
-  checkedInEl.textContent = stats.checkedIn;
-  totalEl.textContent = stats.total;
-  remainingEl.textContent = stats.remaining;
+  if(statsContainer) {
+    statsContainer.style.display = 'block';
+    document.getElementById('stat-checked-in').textContent = stats.checkedIn;
+    document.getElementById('stat-total').textContent = stats.total;
+    document.getElementById('stat-remaining').textContent = stats.remaining;
+  }
 }
+
 function displaySuccessResult(data) {
   const resultContainer = document.getElementById('result-container');
   const { registration, alreadyCheckedIn } = data;
@@ -147,5 +153,3 @@ function escapeHtml(text) {
   div.textContent = text || '';
   return div.innerHTML;
 }
-
-// Initial Stats Load
