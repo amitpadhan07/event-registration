@@ -5,76 +5,62 @@ async function verifyAndMarkAttendance(req, res) {
     const { registrationCode } = req.body;
 
     if (!registrationCode) {
-      return res.status(400).json({
-        success: false,
-        message: 'Registration code is required'
-      });
+      return res.status(400).json({ success: false, message: 'Registration code is required' });
     }
 
+    // 1. Find Registration
     const query = `
-      SELECT 
-        r.*,
-        e.title as event_title,
-        e.event_date,
-        e.venue
+      SELECT r.*, e.title as event_title, e.event_date, e.venue
       FROM registrations r
       JOIN events e ON r.event_id = e.id
       WHERE r.registration_code = $1
     `;
-
     const result = await pool.query(query, [registrationCode]);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Invalid registration code'
-      });
+      return res.status(404).json({ success: false, message: 'Invalid registration code' });
     }
 
     const registration = result.rows[0];
+    let alreadyCheckedIn = registration.attendance;
 
-    if (registration.attendance) {
-      return res.status(200).json({
-        success: true,
-        alreadyCheckedIn: true,
-        message: 'Attendee already checked in',
-        registration: {
-          name: registration.name,
-          email: registration.email,
-          eventTitle: registration.event_title,
-          checkedInAt: registration.created_at
-        }
-      });
+    // 2. Mark Attendance (if not already marked)
+    if (!alreadyCheckedIn) {
+      await pool.query('UPDATE registrations SET attendance = TRUE WHERE registration_code = $1', [registrationCode]);
     }
 
-    const updateQuery = `
-      UPDATE registrations
-      SET attendance = TRUE
-      WHERE registration_code = $1
-      RETURNING *
+    // 3. 👇 NEW: Fetch Live Stats for this Event
+    const statsQuery = `
+      SELECT 
+        COUNT(*) as total,
+        COUNT(*) FILTER (WHERE attendance = TRUE) as checked_in
+      FROM registrations
+      WHERE event_id = $1
     `;
+    const statsResult = await pool.query(statsQuery, [registration.event_id]);
+    const stats = statsResult.rows[0];
 
-    await pool.query(updateQuery, [registrationCode]);
-
+    // 4. Send Response with Stats
     res.json({
       success: true,
-      message: 'Attendance marked successfully',
+      alreadyCheckedIn,
+      message: alreadyCheckedIn ? 'Attendee already checked in' : 'Attendance marked successfully',
       registration: {
         name: registration.name,
         email: registration.email,
-        phone: registration.phone,
         eventTitle: registration.event_title,
-        eventDate: registration.event_date,
         venue: registration.venue
+      },
+      stats: { // Return the stats to frontend
+        total: parseInt(stats.total),
+        checkedIn: parseInt(stats.checked_in),
+        remaining: parseInt(stats.total) - parseInt(stats.checked_in)
       }
     });
 
   } catch (error) {
     console.error('Attendance verification error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to verify attendance'
-    });
+    res.status(500).json({ success: false, message: 'Failed to verify attendance' });
   }
 }
 

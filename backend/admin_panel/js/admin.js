@@ -4,6 +4,9 @@ const API_URL = '/api';
 
 function onScanSuccess(decodedText, decodedResult) {
   // 1. Play a beep sound (Optional)
+  if (navigator.vibrate) {
+     navigator.vibrate(200);
+  }
    const audio = new Audio('/beep.mp3'); audio.play();
 
   console.log(`Code scanned = ${decodedText}`);
@@ -51,23 +54,18 @@ async function verifyAttendance() {
   const input = document.getElementById('qr-code-input');
   const registrationCode = input.value.trim();
   const resultContainer = document.getElementById('result-container');
-
+  
   if (!registrationCode) {
     alert('Please enter a registration code');
     return;
   }
 
-  // Show verifying state
   resultContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Verifying...</p></div>';
 
   try {
     const response = await fetch(`${API_URL}/attendance/verify`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Authorization header is handled by browser popup (Basic Auth),
-        // but if we implemented custom token auth, we would add it here.
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ registrationCode })
     });
 
@@ -75,18 +73,33 @@ async function verifyAttendance() {
 
     if (data.success) {
       displaySuccessResult(data);
-      // Optional: Clear input for next scan after 2 seconds
-      // setTimeout(() => input.value = '', 2000);
+      // 👇 NEW: Update the stats UI
+      updateStats(data.stats);
     } else {
       displayErrorResult(data.message);
     }
-
   } catch (error) {
     console.error('Verification error:', error);
     displayErrorResult('Verification failed. Please try again.');
   }
 }
 
+function updateStats(stats) {
+  if (!stats) return;
+
+  const statsContainer = document.getElementById('stats-container');
+  const checkedInEl = document.getElementById('stat-checked-in');
+  const totalEl = document.getElementById('stat-total');
+  const remainingEl = document.getElementById('stat-remaining');
+
+  // Show the container
+  statsContainer.style.display = 'block';
+
+  // Animate numbers (simple text update)
+  checkedInEl.textContent = stats.checkedIn;
+  totalEl.textContent = stats.total;
+  remainingEl.textContent = stats.remaining;
+}
 function displaySuccessResult(data) {
   const resultContainer = document.getElementById('result-container');
   const { registration, alreadyCheckedIn } = data;
