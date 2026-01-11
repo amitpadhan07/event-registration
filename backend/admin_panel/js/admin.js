@@ -4,20 +4,6 @@ const API_URL = '/api';
 // High pitch beep for success
 const beepSound = new Audio("data:audio/wav;base64,UklGRl9vT19WAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU");
 
-// --- 🧪 TEST BUTTON (Debug) ---
-document.addEventListener('DOMContentLoaded', () => {
-    const header = document.querySelector('header');
-    if(header) {
-        const btn = document.createElement('button');
-        btn.innerText = "📳 Test Vibration";
-        btn.style = "margin-top: 10px; padding: 8px 15px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer;";
-        btn.onclick = () => {
-            triggerFeedback(true); // Force test
-        };
-        header.appendChild(btn);
-    }
-});
-
 // --- 📷 Camera Scanner Logic ---
 
 function onScanSuccess(decodedText, decodedResult) {
@@ -98,21 +84,12 @@ async function verifyAttendance() {
 }
 
 // --- 📳 ROBUST FEEDBACK FUNCTION ---
-function triggerFeedback(isTest = false) {
-  console.log("Attempting feedback...");
-
+function triggerFeedback() {
   // 1. VIBRATE (Simple Single Pulse)
-  // Android allows simple vibrations more easily inside async functions
   try {
     if (navigator.vibrate) {
       // Vibrate for 400ms (Stronger single buzz)
-      const result = navigator.vibrate(400); 
-      console.log("Vibration result:", result);
-      
-      if(isTest) alert("Vibration Command Sent: " + result);
-    } else {
-      console.log("Navigator.vibrate not supported");
-      if(isTest) alert("Vibration NOT supported on this device/browser");
+      navigator.vibrate(400); 
     }
   } catch (e) {
     console.error("Vibration Error:", e);
@@ -124,7 +101,8 @@ function triggerFeedback(isTest = false) {
     const playPromise = beepSound.play();
     if (playPromise !== undefined) {
       playPromise.catch(error => {
-        console.log("Audio playback failed (interaction needed):", error);
+        // Auto-play might be blocked until user interaction
+        // This is normal in some browsers
       });
     }
   } catch (e) {
@@ -146,9 +124,6 @@ function updateStats(stats) {
 function displaySuccessResult(data) {
   const resultContainer = document.getElementById('result-container');
   const { registration, alreadyCheckedIn } = data;
-
-  // Add a debug text for vibration status
-  const vibeStatus = (navigator.vibrate) ? "" : "(No Vibe Support)";
 
   resultContainer.innerHTML = `
     <div class="result-card result-success">
