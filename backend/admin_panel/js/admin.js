@@ -3,21 +3,36 @@ const API_URL = '/api';
 // --- 🔊 BEEP SOUND SETUP ---
 const beepSound = new Audio("data:audio/wav;base64,UklGRl9vT19WAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU");
 
+// --- 🧪 TEST VIBRATION BUTTON ---
+// Add this temporarily to your HTML if you want to test manually
+document.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('header');
+    if(header) {
+        const btn = document.createElement('button');
+        btn.innerText = "📳 Test Vibration";
+        btn.style = "margin-top: 10px; padding: 5px 10px; background: #eee; border: 1px solid #ccc; border-radius: 5px; cursor: pointer;";
+        btn.onclick = () => {
+            console.log("Testing vibration...");
+            triggerFeedback();
+            alert("Did it vibrate?");
+        };
+        header.appendChild(btn);
+    }
+});
+
 // --- 📷 Camera Scanner Logic ---
 
 function onScanSuccess(decodedText, decodedResult) {
   console.log(`Code scanned = ${decodedText}`);
 
-  // 1. Fill the input field
   const input = document.getElementById('qr-code-input');
   
-  // Prevent duplicate scans of the same code immediately
+  // Prevent duplicate scans
   if (input.value === decodedText) return;
 
   input.value = decodedText;
 
-  // 2. Automatically trigger verification
-  // Note: We removed vibration from here!
+  // Trigger verification
   verifyAttendance();
 }
 
@@ -25,11 +40,10 @@ function onScanFailure(error) {
   // console.warn(`Code scan error = ${error}`);
 }
 
-// Initialize the scanner
 const html5QrcodeScanner = new Html5QrcodeScanner(
   "reader",
   { fps: 10, qrbox: { width: 250, height: 250 } },
-  /* verbose= */ false
+  false
 );
 
 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
@@ -55,7 +69,6 @@ async function verifyAttendance() {
     return;
   }
 
-  // Show verifying state
   resultContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Verifying...</p></div>';
 
   try {
@@ -68,8 +81,8 @@ async function verifyAttendance() {
     const data = await response.json();
 
     if (data.success) {
-      // ✅ SUCCESS! Vibrate & Beep HERE now
-      triggerFeedback(); 
+      // ✅ SUCCESS! Trigger Feedback
+      triggerFeedback();
 
       displaySuccessResult(data);
       
@@ -82,24 +95,28 @@ async function verifyAttendance() {
 
   } catch (error) {
     console.error('Verification error:', error);
-    displayErrorResult('Verification failed. Please try again.');
+    displayErrorResult('Verification failed.');
   }
 }
 
-// Helper function for Sound + Vibration
+// Helper function for Sound + Stronger Vibration
 function triggerFeedback() {
-  // 1. 📳 Vibrate (Only on success)
+  // 1. 📳 Vibrate (Pattern: Vibrate 200ms, Pause 100ms, Vibrate 200ms)
   try {
     if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(200);
+      // Trying a pattern - stronger effect
+      const success = window.navigator.vibrate([200, 100, 200]);
+      console.log("Vibration command sent:", success);
+    } else {
+      console.log("Vibration API not supported");
     }
   } catch (e) {
-    console.log("Vibration failed");
+    console.log("Vibration failed:", e);
   }
 
   // 2. 🔊 Play Beep
   try {
-    beepSound.play().catch(e => console.log("Audio requires interaction"));
+    beepSound.play().catch(e => console.log("Audio play failed (interaction needed)"));
   } catch (e) {
     console.log("Sound failed");
   }
@@ -130,16 +147,12 @@ function displaySuccessResult(data) {
         <p><strong>Email:</strong> <span>${escapeHtml(registration.email)}</span></p>
         <p><strong>Event:</strong> <span>${escapeHtml(registration.eventTitle)}</span></p>
       </div>
-      <p style="margin-top: 20px; text-align: center;">
-        ${alreadyCheckedIn ? 'Attendee already checked in.' : 'Marked successfully!'}
-      </p>
     </div>
   `;
 }
 
 function displayErrorResult(message) {
   const resultContainer = document.getElementById('result-container');
-  
   resultContainer.innerHTML = `
     <div class="result-card result-error">
       <h3 style="color: var(--danger);">❌ Verification Failed</h3>
