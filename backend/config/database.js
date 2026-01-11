@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const dbHost = process.env.DB_HOST || '';
 const isRenderDB = dbHost.includes('render.com');
-const isSupabaseDB = dbHost.includes('supabase.co'); // Detect Supabase
+const isSupabaseDB = dbHost.includes('supabase.co');
 const isProduction = process.env.NODE_ENV === 'production';
 
 const pool = new Pool({
@@ -12,6 +12,8 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
+  // 👇 Force IPv4 to fix "ENETUNREACH" errors on Render/Supabase
+  family: 4, 
   // SSL is required for Render and Supabase
   ssl: (isProduction || isRenderDB || isSupabaseDB) ? {
     rejectUnauthorized: false
@@ -19,8 +21,7 @@ const pool = new Pool({
 });
 
 pool.on('connect', () => {
-  // Optional: Log connection success for debugging
-  // console.log('Connected to Database');
+  console.log('Connected to Database');
 });
 
 pool.on('error', (err) => {
