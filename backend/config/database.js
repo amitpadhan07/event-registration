@@ -1,13 +1,19 @@
 const { Pool } = require('pg');
+const dns = require('dns'); // Import DNS module
 require('dotenv').config();
+
+// 👇 GLOBAL FIX: Force Node.js to prefer IPv4 for all connections
+// This works even if the Postgres library ignores the 'family' setting
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 const dbHost = process.env.DB_HOST || '';
 const isRenderDB = dbHost.includes('render.com');
 const isSupabaseDB = dbHost.includes('supabase.co');
 const isProduction = process.env.NODE_ENV === 'production';
 
-// 👇 Debug log to prove new code is running
-console.log(`🔌 Database Config: Host=${dbHost}, SSL=${isSupabaseDB}, IPv4_Forced=TRUE`);
+console.log(`🔌 Database Config: Host=${dbHost}, SSL=${isSupabaseDB}, DNS_Priority=IPv4First`);
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -16,19 +22,18 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
   
-  // 👇 This forces Node.js to ignore the IPv6 address
+  // Keep this as a backup
   family: 4, 
   
   ssl: (isProduction || isRenderDB || isSupabaseDB) ? {
     rejectUnauthorized: false
   } : false,
   
-  // Add timeout settings to prevent hanging
   connectionTimeoutMillis: 5000,
 });
 
 pool.on('connect', () => {
-  console.log('✅ Connected to Database (IPv4)');
+  // console.log('Connected to Database');
 });
 
 pool.on('error', (err) => {
