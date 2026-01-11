@@ -1,17 +1,30 @@
 const API_URL = '/api';
 
+const beepSound = new Audio("data:audio/wav;base64,UklGRl9vT19WAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU");
+
 // --- 📷 Camera Scanner Logic ---
 
 function onScanSuccess(decodedText, decodedResult) {
-  // 1. Play a beep sound (Optional)
-  if (navigator.vibrate) {
-     navigator.vibrate(200);
-  }
-   const audio = new Audio('/beep.mp3'); audio.play();
-
   console.log(`Code scanned = ${decodedText}`);
 
-  // 2. Fill the input field
+  // 1. 📳 Try Vibrate (Android Only)
+  try {
+    if (window.navigator && window.navigator.vibrate) {
+      // Vibrate pattern: 200ms
+      window.navigator.vibrate(200);
+    }
+  } catch (e) {
+    console.log("Vibration not supported");
+  }
+
+  // 2. 🔊 Play Beep Sound
+  try {
+    beepSound.play().catch(e => console.log("Audio requires user interaction first"));
+  } catch (e) {
+    console.log("Sound error");
+  }
+
+  // 3. Fill the input field
   const input = document.getElementById('qr-code-input');
   
   // Prevent duplicate scans of the same code immediately
@@ -19,10 +32,8 @@ function onScanSuccess(decodedText, decodedResult) {
 
   input.value = decodedText;
 
-  // 3. Automatically trigger verification
+  // 4. Automatically trigger verification
   verifyAttendance();
-  
-  // Note: We don't stop the scanner so you can scan the next person immediately.
 }
 
 function onScanFailure(error) {
@@ -30,7 +41,6 @@ function onScanFailure(error) {
 }
 
 // Initialize the scanner
-// "reader" matches the div ID in HTML
 const html5QrcodeScanner = new Html5QrcodeScanner(
   "reader",
   { fps: 10, qrbox: { width: 250, height: 250 } },
