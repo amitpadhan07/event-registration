@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const dbHost = process.env.DB_HOST || '';
 const isRenderDB = dbHost.includes('render.com');
+const isSupabaseDB = dbHost.includes('supabase.co'); // Detect Supabase
 const isProduction = process.env.NODE_ENV === 'production';
 
 const pool = new Pool({
@@ -11,13 +12,15 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
-  // SSL zaroori hai jab hum Render DB se connect karte hain
-  ssl: (isProduction || isRenderDB) ? {
+  // SSL is required for Render and Supabase
+  ssl: (isProduction || isRenderDB || isSupabaseDB) ? {
     rejectUnauthorized: false
   } : false
 });
 
 pool.on('connect', () => {
+  // Optional: Log connection success for debugging
+  // console.log('Connected to Database');
 });
 
 pool.on('error', (err) => {

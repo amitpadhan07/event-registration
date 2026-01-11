@@ -89,7 +89,6 @@ async function sendConfirmationEmail(registrationData, qrCodeDataURL) {
 
 
   try {
-    console.log(`📨 Sending email via Brevo API to ${email}...`);
     await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log(`✅ Email sent successfully to ${email}`);
     return true;
