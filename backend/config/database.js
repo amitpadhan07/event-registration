@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const dbHost = process.env.DB_HOST || '';
 const isRenderDB = dbHost.includes('render.com');
-const isSupabaseDB = dbHost.includes('supabase.co');
+const isSupabaseDB = dbHost.includes('supabase.co'); // Supabase detect karne ke liye
 const isProduction = process.env.NODE_ENV === 'production';
 
 const pool = new Pool({
@@ -12,9 +12,11 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
-  // 👇 Force IPv4 to fix "ENETUNREACH" errors on Render/Supabase
+  
+  // 👇 YEH HAI MAIN FIX (IPv6 error hatane ke liye)
   family: 4, 
-  // SSL is required for Render and Supabase
+  
+  // SSL Render aur Supabase dono ke liye zaroori hai
   ssl: (isProduction || isRenderDB || isSupabaseDB) ? {
     rejectUnauthorized: false
   } : false
