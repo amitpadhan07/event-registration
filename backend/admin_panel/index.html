@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - QR Code Scanner</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
   <div class="container">
@@ -17,7 +18,10 @@
 
       <div class="scanner-section">
         <h2>Scan QR Code for Attendance</h2>
-        <p>Enter the registration code from the attendee's QR code:</p>
+        
+        <div id="reader" style="width: 100%; max-width: 500px; margin: 0 auto 30px;"></div>
+
+        <p>Or enter registration code manually:</p>
 
         <div class="scanner-input">
           <div class="form-group">
@@ -25,7 +29,6 @@
               type="text" 
               id="qr-code-input" 
               placeholder="EVT-XXXX-XXXX-XXXX" 
-              autofocus
             >
           </div>
           <button class="btn btn-primary" id="verify-btn">Verify & Mark Attendance</button>
@@ -36,6 +39,6 @@
     </div>
   </div>
 
-  <script src="/js/admin.js"></script>
+  <script src="js/admin.js"></script>
 </body>
 </html>

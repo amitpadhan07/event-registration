@@ -1,5 +1,44 @@
 const API_URL = '/api';
 
+// --- 📷 Camera Scanner Logic ---
+
+function onScanSuccess(decodedText, decodedResult) {
+  // 1. Play a beep sound (Optional)
+   const audio = new Audio('/beep.mp3'); audio.play();
+
+  console.log(`Code scanned = ${decodedText}`);
+
+  // 2. Fill the input field
+  const input = document.getElementById('qr-code-input');
+  
+  // Prevent duplicate scans of the same code immediately
+  if (input.value === decodedText) return;
+
+  input.value = decodedText;
+
+  // 3. Automatically trigger verification
+  verifyAttendance();
+  
+  // Note: We don't stop the scanner so you can scan the next person immediately.
+}
+
+function onScanFailure(error) {
+  // console.warn(`Code scan error = ${error}`);
+}
+
+// Initialize the scanner
+// "reader" matches the div ID in HTML
+const html5QrcodeScanner = new Html5QrcodeScanner(
+  "reader",
+  { fps: 10, qrbox: { width: 250, height: 250 } },
+  /* verbose= */ false
+);
+
+html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+
+// --- ⌨️ Existing Verification Logic ---
+
 document.getElementById('verify-btn').addEventListener('click', verifyAttendance);
 
 document.getElementById('qr-code-input').addEventListener('keypress', (e) => {
@@ -18,6 +57,7 @@ async function verifyAttendance() {
     return;
   }
 
+  // Show verifying state
   resultContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Verifying...</p></div>';
 
   try {
@@ -25,6 +65,8 @@ async function verifyAttendance() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // Authorization header is handled by browser popup (Basic Auth),
+        // but if we implemented custom token auth, we would add it here.
       },
       body: JSON.stringify({ registrationCode })
     });
@@ -33,12 +75,11 @@ async function verifyAttendance() {
 
     if (data.success) {
       displaySuccessResult(data);
+      // Optional: Clear input for next scan after 2 seconds
+      // setTimeout(() => input.value = '', 2000);
     } else {
       displayErrorResult(data.message);
     }
-
-    input.value = '';
-    input.focus();
 
   } catch (error) {
     console.error('Verification error:', error);
@@ -58,12 +99,10 @@ function displaySuccessResult(data) {
       <div class="attendee-info">
         <p><strong>Name:</strong> <span>${escapeHtml(registration.name)}</span></p>
         <p><strong>Email:</strong> <span>${escapeHtml(registration.email)}</span></p>
-        ${registration.phone ? `<p><strong>Phone:</strong> <span>${escapeHtml(registration.phone)}</span></p>` : ''}
         <p><strong>Event:</strong> <span>${escapeHtml(registration.eventTitle)}</span></p>
-        ${registration.venue ? `<p><strong>Venue:</strong> <span>${escapeHtml(registration.venue)}</span></p>` : ''}
       </div>
       <p style="margin-top: 20px; text-align: center;">
-        ${alreadyCheckedIn ? 'This attendee was already checked in.' : 'Attendance marked successfully!'}
+        ${alreadyCheckedIn ? 'Attendee already checked in.' : 'Marked successfully!'}
       </p>
     </div>
   `;
@@ -82,6 +121,6 @@ function displayErrorResult(message) {
 
 function escapeHtml(text) {
   const div = document.createElement('div');
-  div.textContent = text;
+  div.textContent = text || '';
   return div.innerHTML;
 }
