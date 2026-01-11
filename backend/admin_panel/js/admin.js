@@ -1,20 +1,18 @@
 const API_URL = '/api';
 
 // --- 🔊 BEEP SOUND SETUP ---
+// High pitch beep for success
 const beepSound = new Audio("data:audio/wav;base64,UklGRl9vT19WAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU");
 
-// --- 🧪 TEST VIBRATION BUTTON ---
-// Add this temporarily to your HTML if you want to test manually
+// --- 🧪 TEST BUTTON (Debug) ---
 document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('header');
     if(header) {
         const btn = document.createElement('button');
         btn.innerText = "📳 Test Vibration";
-        btn.style = "margin-top: 10px; padding: 5px 10px; background: #eee; border: 1px solid #ccc; border-radius: 5px; cursor: pointer;";
+        btn.style = "margin-top: 10px; padding: 8px 15px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer;";
         btn.onclick = () => {
-            console.log("Testing vibration...");
-            triggerFeedback();
-            alert("Did it vibrate?");
+            triggerFeedback(true); // Force test
         };
         header.appendChild(btn);
     }
@@ -32,7 +30,7 @@ function onScanSuccess(decodedText, decodedResult) {
 
   input.value = decodedText;
 
-  // Trigger verification
+  // Verification process start
   verifyAttendance();
 }
 
@@ -81,7 +79,7 @@ async function verifyAttendance() {
     const data = await response.json();
 
     if (data.success) {
-      // ✅ SUCCESS! Trigger Feedback
+      // ✅ SUCCESS! Trigger Feedback IMMEDIATELY
       triggerFeedback();
 
       displaySuccessResult(data);
@@ -99,26 +97,38 @@ async function verifyAttendance() {
   }
 }
 
-// Helper function for Sound + Stronger Vibration
-function triggerFeedback() {
-  // 1. 📳 Vibrate (Pattern: Vibrate 200ms, Pause 100ms, Vibrate 200ms)
+// --- 📳 ROBUST FEEDBACK FUNCTION ---
+function triggerFeedback(isTest = false) {
+  console.log("Attempting feedback...");
+
+  // 1. VIBRATE (Simple Single Pulse)
+  // Android allows simple vibrations more easily inside async functions
   try {
-    if (window.navigator && window.navigator.vibrate) {
-      // Trying a pattern - stronger effect
-      const success = window.navigator.vibrate([200, 100, 200]);
-      console.log("Vibration command sent:", success);
+    if (navigator.vibrate) {
+      // Vibrate for 400ms (Stronger single buzz)
+      const result = navigator.vibrate(400); 
+      console.log("Vibration result:", result);
+      
+      if(isTest) alert("Vibration Command Sent: " + result);
     } else {
-      console.log("Vibration API not supported");
+      console.log("Navigator.vibrate not supported");
+      if(isTest) alert("Vibration NOT supported on this device/browser");
     }
   } catch (e) {
-    console.log("Vibration failed:", e);
+    console.error("Vibration Error:", e);
   }
 
-  // 2. 🔊 Play Beep
+  // 2. SOUND
   try {
-    beepSound.play().catch(e => console.log("Audio play failed (interaction needed)"));
+    beepSound.currentTime = 0;
+    const playPromise = beepSound.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.log("Audio playback failed (interaction needed):", error);
+      });
+    }
   } catch (e) {
-    console.log("Sound failed");
+    console.error("Sound Error:", e);
   }
 }
 
@@ -136,6 +146,9 @@ function updateStats(stats) {
 function displaySuccessResult(data) {
   const resultContainer = document.getElementById('result-container');
   const { registration, alreadyCheckedIn } = data;
+
+  // Add a debug text for vibration status
+  const vibeStatus = (navigator.vibrate) ? "" : "(No Vibe Support)";
 
   resultContainer.innerHTML = `
     <div class="result-card result-success">
