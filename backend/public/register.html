@@ -3,50 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Event Registration Form</title>
+  <title>Register - IEEE Events</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🎉 Event Registration</h1>
-    </header>
 
+  <header>
+    <div class="container">
+      <h1>🎓 IEEE Event Portal</h1>
+    </div>
+  </header>
+
+  <div class="container">
     <div class="main-content">
-      <a href="/" class="back-link">← Back to Events</a>
+      
+      <div style="max-width: 600px; margin: 0 auto;">
+        <a href="/" class="back-link">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to All Events
+        </a>
+      </div>
 
       <div id="loading" class="loading">
         <div class="spinner"></div>
-        <p>Loading event details...</p>
+        <p>Loading details...</p>
       </div>
 
       <div id="registration-form-container" style="display: none;">
+        
         <div id="event-details" class="event-details-box"></div>
 
-        <div id="success-message" class="alert alert-success" style="display: none;"></div>
-        <div id="error-message" class="alert alert-error" style="display: none;"></div>
+        <div style="max-width: 600px; margin: 0 auto;">
+          <div id="success-message" class="alert alert-success" style="display: none;"></div>
+          <div id="error-message" class="alert alert-error" style="display: none;"></div>
+        </div>
 
         <form id="registration-form">
+          <h3 style="margin-bottom: 20px; color: var(--text-main);">Attendee Information</h3>
+          
           <div class="form-group">
-            <label for="name">Full Name *</label>
-            <input type="text" id="name" name="name" required>
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" placeholder="e.g. John Doe" required>
           </div>
 
           <div class="form-group">
-            <label for="email">Email Address *</label>
-            <input type="email" id="email" name="email" required>
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="john@example.com" required>
           </div>
 
           <div class="form-group">
-            <label for="phone">Phone Number *</label>
-            <input type="tel" id="phone" name="phone" required placeholder="+1234567890">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210" required>
           </div>
 
           <button type="submit" class="btn btn-primary" id="submit-btn">
-            Register for Event
+            Confirm Registration
           </button>
+          
+          <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+            A QR code ticket will be sent to your email immediately upon registration.
+          </p>
         </form>
       </div>
+
     </div>
   </div>
 

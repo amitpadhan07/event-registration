@@ -3,28 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Event Registration - Browse Events</title>
+  <title>IEEE Events Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🎉 IEEE Event Registration System</h1>
-    </header>
+  
+  <header>
+    <div class="container">
+      <h1>
+        <span>🎓 IEEE Event Portal</span>
+      </h1>
+      </div>
+  </header>
 
+  <div class="container">
     <div class="main-content">
-      <h2>Upcoming Events</h2>
+      <h2>Upcoming Opportunities</h2>
+      <p style="color: var(--text-muted); margin-bottom: 30px;">Browse and register for our latest workshops, seminars, and meetups.</p>
       
       <div id="loading" class="loading">
         <div class="spinner"></div>
-        <p>Loading events...</p>
+        <p>Fetching events...</p>
       </div>
 
       <div id="error-message" class="alert alert-error" style="display: none;"></div>
 
       <div id="events-container" class="events-grid" style="display: none;"></div>
-
-      </div>
+    </div>
   </div>
 
   <script src="/js/events.js"></script>
