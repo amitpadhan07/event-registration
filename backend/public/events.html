@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events - IEEE-SB GEHU</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">🎓 IEEE-SB GEHU</a>
+      <div class="nav-menu">
+        <a href="/" class="nav-link">About</a>
+        <a href="/events" class="nav-link active">Events</a>
+        <a href="/member-drive" class="nav-link">Member Drive</a>
+        <a href="/contact" class="nav-link">Contact Us</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="main-content">
+      <div class="section-header">
+        <h2>Upcoming Opportunities</h2>
+        <p style="color: var(--text-muted);">Browse and register for our latest workshops, seminars, and meetups.</p>
+      </div>
+      
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Fetching events...</p>
+      </div>
+
+      <div id="error-message" class="alert alert-error" style="display: none;"></div>
+
+      <div id="events-container" class="events-grid" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script src="/js/events.js"></script>
+</body>
+</html>

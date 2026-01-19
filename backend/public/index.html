@@ -3,38 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IEEE Events Portal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>IEEE-SB GEHU | Home</title>
   <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  
-  <header>
-    <div class="container">
-      <h1>
-        <span>🎓 IEEE Event Portal</span>
-      </h1>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">🎓 IEEE-SB GEHU</a>
+      <div class="nav-menu">
+        <a href="/" class="nav-link active">About</a>
+        <a href="/events" class="nav-link">Events</a>
+        <a href="/member-drive" class="nav-link">Member Drive</a>
+        <a href="/contact" class="nav-link">Contact Us</a>
       </div>
-  </header>
+    </div>
+  </nav>
 
   <div class="container">
-    <div class="main-content">
-      <h2>Upcoming Opportunities</h2>
-      <p style="color: var(--text-muted); margin-bottom: 30px;">Browse and register for our latest workshops, seminars, and meetups.</p>
+    
+    <section class="hero-section">
+      <h1>Welcome to IEEE Student Branch</h1>
+      <p style="max-width: 700px; margin: 20px auto; color: var(--text-muted);">
+        Graphic Era Hill University's IEEE Student Branch is dedicated to fostering technological innovation and excellence for the benefit of humanity. We organize workshops, seminars, and technical events to bridge the gap between industry and academia.
+      </p>
+      <a href="/events" class="btn btn-primary" style="width: auto;">View Upcoming Events</a>
+    </section>
+
+    <div class="section-header">
+      <h2>Our Leadership</h2>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <img src="/images/HOD.jpg" alt="HOD Name" class="team-img">
+        <h3>Dr. Anupam Singh</h3>
+        <p style="color: var(--secondary); font-weight: 600;">Head of Department</p>
+        <p class="text-muted">Guiding our vision and academic excellence.</p>
+      </div>
       
-      <div id="loading" class="loading">
-        <div class="spinner"></div>
-        <p>Fetching events...</p>
+      <div class="team-card">
+        <img src="/images/faculty.jpg" alt="Faculty Name" class="team-img">
+        <h3>Prof. [Name]</h3>
+        <p style="color: var(--secondary); font-weight: 600;">Faculty Coordinator</p>
+        <p class="text-muted">Mentoring students towards success.</p>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <h2>Core Team</h2>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <img src="/images/chairperson.jpg" alt="Amit Padhan" class="team-img">
+        <h3>Amit Padhan</h3>
+        <p>Chairperson</p>
+      </div>
+      
+      <div class="team-card">
+        <img src="/images/vice-chair.jpg" alt="Member Name" class="team-img">
+        <h3>[Name]</h3>
+        <p>Vice-Chairperson</p>
       </div>
 
-      <div id="error-message" class="alert alert-error" style="display: none;"></div>
+      <div class="team-card">
+        <img src="/images/secretary.jpg" alt="Member Name" class="team-img">
+        <h3>[Name]</h3>
+        <p>Secretary</p>
+      </div>
 
-      <div id="events-container" class="events-grid" style="display: none;"></div>
+      <div class="team-card">
+        <img src="/images/treasurer.jpg" alt="Member Name" class="team-img">
+        <h3>[Name]</h3>
+        <p>Treasurer</p>
+      </div>
     </div>
+
+    <div class="section-header">
+      <h2>Event Highlights</h2>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item">Tech Con 2025</div>
+      <div class="gallery-item">AI Workshop</div>
+      <div class="gallery-item">Hackathon Winners</div>
+      <div class="gallery-item">Guest Lecture</div>
+    </div>
+
   </div>
 
-  <script src="/js/events.js"></script>
+  <footer style="text-align: center; padding: 40px; color: var(--text-muted); margin-top: 50px;">
+    &copy; 2026 IEEE Student Branch GEHU. All rights reserved.
+  </footer>
+
 </body>
 </html>

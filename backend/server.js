@@ -10,7 +10,6 @@ require('dotenv').config();
 const eventRoutes = require('./routes/eventRoutes');
 const registrationRoutes = require('./routes/registrationRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
-// 👇 Import the centralized auth middleware we just created
 const { adminAuth } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -21,55 +20,52 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- 🔒 PROTECTED ROUTES (Require Password) ---
-
-// 1. Serve Admin Panel
-// When someone visits /admin, check password first, then serve the files
+// --- 🔒 PROTECTED ROUTES ---
 app.use('/admin', adminAuth, express.static(path.join(__dirname, 'admin_panel')));
-
-// 2. Protect Attendance API
-// Prevents external scripts from marking attendance without password
 app.use('/api/attendance', adminAuth, attendanceRoutes);
 
+// --- 🌍 PUBLIC API ROUTES ---
+app.use('/api/events', eventRoutes);
+app.use('/api/registrations', registrationRoutes);
 
-// --- 🌍 PUBLIC ROUTES (Open to everyone) ---
-
-// 3. API Routes
-app.use('/api/events', eventRoutes); // Events are public (GET) or protected (POST/PUT/DELETE) inside the route file
-app.use('/api/registrations', registrationRoutes); // Registration is public
-
-// 4. Serve Public Frontend (HTML/CSS/JS)
+// --- 📄 STATIC PAGES & ROUTING ---
+// Serve static assets (CSS, JS, Images)
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-// --- 🛠️ UTILITIES ---
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Server is running',
-    timestamp: new Date(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+// Explicit Routes for Multi-Page Layout
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Serve frontend index.html for any unknown routes (SPA support)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.get('/events', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'events.html'));
+});
+
+app.get('/member-drive', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'member-drive.html'));
+});
+
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+});
+
+// Register page (Specific event registration)
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+// 404 Fallback
+app.use((req, res) => {
+  res.status(404).send('<h1>404 - Page Not Found</h1><a href="/">Go Home</a>');
 });
 
 // Global Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!'
-  });
+  res.status(500).json({ success: false, message: 'Something went wrong!' });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 Public App: http://localhost:${PORT}`);
-  console.log(`🔐 Admin Panel: http://localhost:${PORT}/admin`);
+  console.log(`📡 Website: http://localhost:${PORT}`);
 });
