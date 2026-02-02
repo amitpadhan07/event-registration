@@ -46,6 +46,7 @@ document.getElementById('event-form').addEventListener('submit', async (e) => {
     
     const data = await res.json();
     if (data.success) {
+      
       alert('Event saved successfully!');
       window.location.href = 'manage-events.html';
     } else {
